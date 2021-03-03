@@ -49,7 +49,7 @@ jobs:
           !venv/
 
   infra-to-setup:
-    needs: terraform-build
+    needs: build-and-test
     runs-on: ubuntu-latest
 
     steps:
