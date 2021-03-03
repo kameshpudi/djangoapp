@@ -64,7 +64,7 @@ jobs:
         run: terraform apply -auto-approve
 
   deploy-to-webapp:
-    needs: build-and-test
+    needs: infra-to-setup
     runs-on: ubuntu-latest
 
     steps:
