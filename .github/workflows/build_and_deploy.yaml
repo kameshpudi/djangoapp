@@ -83,9 +83,16 @@ jobs:
         with:  
           app-name: ${{ env.WEBAPP_NAME }}
           app-settings-json: '[{ "name": "DISABLE_COLLECTSTATIC", "value": "true" }, { "name": "POST_BUILD_COMMAND",  "value": "python manage.py makemigrations && python manage.py migrate" }, { "name": "SCM_DO_BUILD_DURING_DEPLOYMENT", "value": "true" }, { "name": "DJANGO_ENV", "value": "production"}]'
-
+      
+      - name: Build using AppService-Build
+        uses: azure/appservice-build@v2
+        with:
+        platform: python
+        platform-version: '3.8'
+        
       - name: Deploy to App Service
         uses: azure/webapps-deploy@v2
         with:
           app-name: ${{ env.WEBAPP_NAME}}
+          slot-name: 'production'
 
