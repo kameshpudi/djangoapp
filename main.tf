@@ -2,22 +2,33 @@
 provider "azurerm" {
   features {}
 }
-
 terraform {
   backend "azurerm" {
-    resource_group_name  = "RG-DEVOPS-WIPRO"
-    storage_account_name = "kkterraformrmstate"
-    container_name       = "terraform-state"
+    resource_group_name  = azurerm_resource_group.dev.name
+    storage_account_name = azurerm_storage_account.dev.name
+    container_name       = azurerm_storage_container.dev.name
     key                  = "terraform.tfstate"
   }
 }
-
 resource "azurerm_resource_group" "dev" {
   name     = var.rg_name
   location = var.location
 
 }
-
+resource "azurerm_storage_account" "dev" {
+  name                     = "kkterraformrmstate"
+  resource_group_name      = azurerm_resource_group.dev.name
+  location                 = azurerm_resource_group.dev.location
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+  depends_on          = [azurerm_resource_group.dev]
+}
+resource "azurerm_storage_container" "dev" {
+  name                  = "terraform-state"
+  storage_account_name  = azurerm_storage_account.dev.name
+  container_access_type = "private"
+  depends_on          = [azurerm_storage_account.dev]
+}
 resource "azurerm_postgresql_server" "dev" {
   name                = var.db_server
   location            = "${azurerm_resource_group.dev.location}"
@@ -79,12 +90,9 @@ resource "azurerm_app_service" "dev" {
   app_settings = {
     "DBHOST" = "${azurerm_postgresql_server.dev.name}"
     "DBNAME" = "${azurerm_postgresql_database.dev.name}"
-
-    # These are app specific environment variables
     "DBUSER" = var.admin_login
     "DBPASS" = var.admin_pwd
 
   }
 
 }
-#https://github.com/innovationnorway/terraform-azurerm-web-app/blob/master/main.tf
