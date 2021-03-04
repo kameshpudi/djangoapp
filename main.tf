@@ -79,7 +79,50 @@ resource "azurerm_app_service" "dev" {
     "DBNAME" = "${azurerm_postgresql_database.dev.name}"
     "DBUSER" = var.admin_login
     "DBPASS" = var.admin_pwd
+  }
+}
 
+resource "azurerm_frontdoor" "dev" {
+  name                                         = "notejam-FrontDoor"
+  location                                     = "westeurope"
+  resource_group_name                          = azurerm_resource_group.dev.name
+  enforce_backend_pools_certificate_name_check = false
+
+  routing_rule {
+    name               = "notejamRoutingRule1"
+    accepted_protocols = ["Http", "Https"]
+    patterns_to_match  = ["/*"]
+    frontend_endpoints = ["notejamFrontendEndpoint1"]
+    forwarding_configuration {
+      forwarding_protocol = "MatchRequest"
+      backend_pool_name   = "notejamBackendBing"
+    }
   }
 
+  backend_pool_load_balancing {
+    name = "notejamLoadBalancingSettings1"
+  }
+
+  backend_pool_health_probe {
+    name = "notejamHealthProbeSetting1"
+  }
+
+  backend_pool {
+    name = "notejamBackendBing"
+    backend {
+      host_header = "${azurerm_app_service.dev.name}.azurewebsites.net"
+      address     = "${azurerm_app_service.dev.name}.azurewebsites.net"
+      http_port   = 80
+      https_port  = 443
+    }
+
+    load_balancing_name = "notejamLoadBalancingSettings1"
+    health_probe_name   = "notejamHealthProbeSetting1"
+  }
+
+  frontend_endpoint {
+    name                              = "notejamFrontendEndpoint1"
+    host_name                         = "notejam-FrontDoor.azurefd.net"
+    custom_https_provisioning_enabled = false
+  }
 }
