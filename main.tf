@@ -2,11 +2,12 @@
 provider "azurerm" {
   features {}
 }
+
 terraform {
   backend "azurerm" {
-    resource_group_name  = azurerm_resource_group.dev.name
-    storage_account_name = azurerm_storage_account.dev.name
-    container_name       = azurerm_storage_container.dev.name
+    resource_group_name  = "NOTEJAM-DEMO-RG"
+    storage_account_name = "kkterraformrmstate"
+    container_name       = "terraform-state"
     key                  = "terraform.tfstate"
   }
 }
@@ -15,6 +16,7 @@ resource "azurerm_resource_group" "dev" {
   location = var.location
 
 }
+
 resource "azurerm_storage_account" "dev" {
   name                     = "kkterraformrmstate"
   resource_group_name      = azurerm_resource_group.dev.name
