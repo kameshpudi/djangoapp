@@ -5,7 +5,7 @@ provider "azurerm" {
 
 terraform {
   backend "azurerm" {
-    resource_group_name  = "NOTEJAM-DEMO-RG"
+    resource_group_name  = "NOTEJAM-DEMO-RG1"
     storage_account_name = "kkterraformrmstate"
     container_name       = "terraform-state"
     key                  = "terraform.tfstate"
@@ -15,21 +15,6 @@ resource "azurerm_resource_group" "dev" {
   name     = var.rg_name
   location = var.location
 
-}
-
-resource "azurerm_storage_account" "dev" {
-  name                     = "kkterraformrmstate"
-  resource_group_name      = azurerm_resource_group.dev.name
-  location                 = azurerm_resource_group.dev.location
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
-  depends_on          = [azurerm_resource_group.dev]
-}
-resource "azurerm_storage_container" "dev" {
-  name                  = "terraform-state"
-  storage_account_name  = azurerm_storage_account.dev.name
-  container_access_type = "private"
-  depends_on          = [azurerm_storage_account.dev]
 }
 resource "azurerm_postgresql_server" "dev" {
   name                = var.db_server
