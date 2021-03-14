@@ -1,0 +1,32 @@
+trigger:
+- notejamdocker
+variables:
+- name: BuildParameters.azureContainerRegistry
+  value: '{"loginServer":"kknotejamapp.azurecr.io", "id" : ""}'
+resources:
+  repositories:
+  - repository: self
+    type: git
+    ref: notejamdocker
+jobs:
+- job: Job_1
+  displayName: AGENT JOB 1 
+  pool:
+    vmImage: ubuntu-20.04
+  steps:
+  - checkout: self
+  - task: DockerCompose@0
+    displayName: Docker Compose
+    inputs:
+      azureSubscriptionEndpoint: ''
+      azureContainerRegistry: $(BuildParameters.azureContainerRegistry)
+      dockerComposeFile: docker-compose.yml
+      dockerComposeCommand: up --build --no-start
+  - task: DockerCompose@0
+    displayName: Push services
+    inputs:
+      azureSubscriptionEndpoint: ''
+      azureContainerRegistry: '{"loginServer":"kknotejamapp.azurecr.io", "id" : ""}'
+      dockerComposeFile: docker-compose.yml
+      action: Push services
+...

@@ -1,0 +1,11 @@
+version: '3.4'
+
+services:
+  jonnychipz-blazorwasm:
+    image: kknotejamapp.azurecr.io/kknotejamapp
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 4080:80
+      - 5443:443
